@@ -66,18 +66,20 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 EditText input = findViewById(R.id.input);
 
-                // Read the input field and push a new instance
-                // of ChatMessage to the Firebase database
-                FirebaseDatabase.getInstance()
-                        .getReference()
-                        .push()
-                        .setValue(new ChatMessage(input.getText().toString(),
-                                FirebaseAuth.getInstance()
-                                        .getCurrentUser()
-                                        .getDisplayName())
-                        );
+                String inputTxt = input.getText().toString().trim();
 
-
+                if(!inputTxt.equals("")) {
+                    FirebaseDatabase.getInstance()
+                            .getReference()
+                            .push()
+                            .setValue(new ChatMessage(inputTxt,
+                                    FirebaseAuth.getInstance()
+                                            .getCurrentUser()
+                                            .getDisplayName(),
+                                    FirebaseAuth.getInstance()
+                                            .getCurrentUser().getUid())
+                            );
+                }
                 // Clear the input
                 input.setText("");
             }
@@ -89,6 +91,7 @@ public class MainActivity extends AppCompatActivity {
 
         ListView listOfMessages;
         listOfMessages = findViewById(R.id.list_of_messages);
+
         adapter = new FirebaseListAdapter<ChatMessage>(this, ChatMessage.class,
                 R.layout.message, FirebaseDatabase.getInstance().getReference()) {
             @Override
@@ -97,6 +100,8 @@ public class MainActivity extends AppCompatActivity {
                 messageText = v.findViewById(R.id.message_text);
                 messageUser = v.findViewById(R.id.message_user);
                 messageTime = v.findViewById(R.id.message_time);
+
+                //if(model.getUserId().equals(FirebaseAuth.getInstance().getCurrentUser().getUid()))
 
                 // Set their text
                 messageText.setText(model.getMessageText());
